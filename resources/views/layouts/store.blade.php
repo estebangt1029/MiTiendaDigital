@@ -10,151 +10,68 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         * { font-family: 'Inter', sans-serif; }
 
-        /* Sidebar transition */
-        #sidebar {
-            transition: transform 0.28s cubic-bezier(.4,0,.2,1);
-        }
-        #sidebar-overlay {
-            transition: opacity 0.28s ease;
-        }
-
-        /* Nav link activo */
         :root{
-    --primary:#6366f1;
-    --primary-light:#818cf8;
-}
+            --primary:#6366f1;
+            --primary-light:#818cf8;
+        }
 
-#sidebar{
-    transition: transform .28s cubic-bezier(.4,0,.2,1);
-    background: linear-gradient(
-        180deg,
-        #020617 0%,
-        #0f172a 40%,
-        #020617 100%
-    );
-}
+        #sidebar{
+            transition: transform .28s cubic-bezier(.4,0,.2,1);
+            background: linear-gradient(180deg, #020617 0%, #0f172a 40%, #020617 100%);
+        }
 
-#sidebar-overlay{
-    transition: opacity .28s ease;
-}
+        #sidebar-overlay{
+            transition: opacity .28s ease;
+        }
 
-.nav-link{
-    display:flex;
-    align-items:center;
-    gap:14px;
-    padding:12px 14px;
-    border-radius:16px;
-    font-size:.92rem;
-    font-weight:500;
-    transition:.25s;
-    position:relative;
-}
+        .nav-link{
+            display:flex;
+            align-items:center;
+            gap:14px;
+            padding:12px 14px;
+            border-radius:16px;
+            font-size:.92rem;
+            font-weight:500;
+            transition:.25s;
+            position:relative;
+        }
 
-.nav-link.inactive{
-    color:#cbd5e1;
-}
+        .nav-link.inactive{ color:#cbd5e1; }
+        .nav-link.inactive svg{ color:#94a3b8; }
+        .nav-link.inactive:hover{ background:rgba(255,255,255,.05); color:white; transform:translateX(3px); }
+        .nav-link.inactive:hover svg{ color:white; }
 
-.nav-link.inactive svg{
-    color:#94a3b8;
-}
+        .nav-link.active{
+            color:white;
+            background:rgba(99,102,241,.15);
+            border:1px solid rgba(99,102,241,.35);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 10px 20px rgba(99,102,241,.15);
+        }
+        .nav-link.active svg{ color:#818cf8; }
 
-.nav-link.inactive:hover{
-    background:rgba(255,255,255,.05);
-    color:white;
-    transform:translateX(3px);
-}
+        .section-title{
+            color:#64748b;
+            font-size:.72rem;
+            font-weight:700;
+            letter-spacing:.14em;
+            text-transform:uppercase;
+            padding-left:14px;
+        }
 
-.nav-link.inactive:hover svg{
-    color:white;
-}
+        @media (max-width:1023px){
+            #sidebar{ transform:translateX(-100%); }
+            #sidebar.open{ transform:translateX(0); }
+        }
 
-.nav-link.active{
-    color:white;
-    background:rgba(99,102,241,.15);
-    border:1px solid rgba(99,102,241,.35);
-    box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.05),
-        0 10px 20px rgba(99,102,241,.15);
-}
+        ::-webkit-scrollbar{ width:5px; }
+        ::-webkit-scrollbar-thumb{ background:#475569; border-radius:999px; }
 
-.nav-link.active svg{
-    color:#818cf8;
-}
+        .hamburger-line{ transition: transform .25s ease, opacity .2s ease, top .25s ease, bottom .25s ease; }
+        #hamburger-btn.open .hamburger-line:nth-child(1){ top:50%; transform:translateY(-50%) rotate(45deg); }
+        #hamburger-btn.open .hamburger-line:nth-child(2){ opacity:0; }
+        #hamburger-btn.open .hamburger-line:nth-child(3){ bottom:50%; transform:translateY(50%) rotate(-45deg); }
 
-.menu-icon{
-    width:38px;
-    height:38px;
-    border-radius:12px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:rgba(255,255,255,.05);
-    flex-shrink:0;
-}
-
-.section-title{
-    color:#64748b;
-    font-size:.72rem;
-    font-weight:700;
-    letter-spacing:.14em;
-    text-transform:uppercase;
-    padding-left:14px;
-}
-
-.sidebar-divider{
-    height:1px;
-    background:linear-gradient(
-        90deg,
-        transparent,
-        rgba(255,255,255,.08),
-        transparent
-    );
-}
-
-@media (max-width:1023px){
-    #sidebar{
-        transform:translateX(-100%);
-    }
-
-    #sidebar.open{
-        transform:translateX(0);
-    }
-}
-
-::-webkit-scrollbar{
-    width:5px;
-}
-
-::-webkit-scrollbar-thumb{
-    background:#475569;
-    border-radius:999px;
-}
-
-.hamburger-line{
-    transition:
-    transform .25s ease,
-    opacity .2s ease,
-    top .25s ease,
-    bottom .25s ease;
-}
-
-#hamburger-btn.open .hamburger-line:nth-child(1){
-    top:50%;
-    transform:translateY(-50%) rotate(45deg);
-}
-
-#hamburger-btn.open .hamburger-line:nth-child(2){
-    opacity:0;
-}
-
-#hamburger-btn.open .hamburger-line:nth-child(3){
-    bottom:50%;
-    transform:translateY(50%) rotate(-45deg);
-}
-
-[x-cloak]{
-    display:none;
-}
+        [x-cloak]{ display:none; }
     </style>
     @stack('styles')
     <link rel="manifest" href="/manifest.json">
@@ -174,79 +91,82 @@
 
 {{-- ══ SIDEBAR ══ --}}
 <aside id="sidebar"
-class="fixed top-0 left-0 h-full w-72 z-50 flex flex-col border-r border-white/5 shadow-2xl lg:translate-x-0">
+       class="fixed top-0 left-0 h-full w-72 z-50 flex flex-col border-r border-white/5 shadow-2xl lg:translate-x-0">
 
     {{-- Logo --}}
     <div class="p-5">
-    <div class="rounded-3xl border border-white/10 bg-white/5 p-4 backdrop-blur">
-        <div class="flex items-center gap-3">
-
-            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-
-                <svg class="w-6 h-6 text-white"
-                     fill="none"
-                     stroke="currentColor"
-                     viewBox="0 0 24 24">
-
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16"/>
-                </svg>
-
+        <div class="rounded-3xl border border-white/10 bg-white/5 p-4 backdrop-blur">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16"/>
+                    </svg>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-[10px] uppercase tracking-[.2em] text-slate-400">Tienda activa</p>
+                    <h2 class="text-white font-bold truncate">{{ session('store_name', 'Mi Tienda') }}</h2>
+                    <p class="text-xs text-slate-500">Sistema POS</p>
+                </div>
             </div>
-
-            <div class="min-w-0">
-                <p class="text-[10px] uppercase tracking-[.2em] text-slate-400">
-                    Tienda activa
-                </p>
-
-                <h2 class="text-white font-bold truncate">
-                    {{ session('store_name', 'Mi Tienda') }}
-                </h2>
-
-                <p class="text-xs text-slate-500">
-                    Sistema POS
-                </p>
-            </div>
-
         </div>
     </div>
-</div>
 
-<div class="px-5 pb-4">
-    <div class="grid grid-cols-2 gap-3">
+    {{--
+        Estado y días restantes con datos reales.
+        $subscriptionDaysLeft y $subscriptionActive se comparten desde
+        CheckSubscription (middleware) vía view()->share().
+        Si por algún motivo no llegan (ej. vista renderizada fuera del
+        middleware), se muestran valores neutros en vez de inventar datos.
+    --}}
+    @php
+        $subActive  = $subscriptionActive ?? null;
+        $daysLeft   = $subscriptionDaysLeft ?? null;
+    @endphp
+    <div class="px-5 pb-4">
+        <div class="grid grid-cols-2 gap-3">
+            <div class="rounded-2xl bg-white/5 border border-white/5 p-3">
+                <p class="text-[11px] text-slate-500">Estado</p>
+                @if($subActive === true)
+                    <p class="text-emerald-400 font-semibold flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Activa
+                    </p>
+                @elseif($subActive === false)
+                    <p class="text-red-400 font-semibold flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-red-400"></span> Inactiva
+                    </p>
+                @else
+                    <p class="text-slate-400 font-semibold">—</p>
+                @endif
+            </div>
 
-        <div class="rounded-2xl bg-white/5 border border-white/5 p-3">
-            <p class="text-[11px] text-slate-500">
-                Estado
-            </p>
-
-            <p class="text-emerald-400 font-semibold">
-                Activa
-            </p>
+            <div class="rounded-2xl bg-white/5 border border-white/5 p-3">
+                <p class="text-[11px] text-slate-500">Plan</p>
+                @if(is_numeric($daysLeft))
+                    @php $daysLeftInt = (int) floor($daysLeft); @endphp
+                    <p class="{{ $daysLeftInt <= 7 ? 'text-amber-400' : 'text-indigo-400' }} font-semibold">
+                        {{ $daysLeftInt > 0 ? $daysLeftInt.' día'.($daysLeftInt == 1 ? '' : 's') : 'Vencido' }}
+                    </p>
+                @else
+                    <p class="text-slate-400 font-semibold">—</p>
+                @endif
+            </div>
         </div>
-
-        <div class="rounded-2xl bg-white/5 border border-white/5 p-3">
-            <p class="text-[11px] text-slate-500">
-                Plan
-            </p>
-
-            <p class="text-indigo-400 font-semibold">
-                PRO
-            </p>
-        </div>
-
     </div>
-</div>
 
-    {{-- Nav principal --}}
-    <nav class="flex-1 px-3 py-5 space-y-2 overflow-y-auto">
-        <p class="section-title mb-3">
-        Principal
-        </p>
+    {{-- Nav principal — ordenado por frecuencia de uso real en una tienda --}}
+    <nav class="flex-1 px-3 py-2 space-y-2 overflow-y-auto">
 
+        {{-- 1. Nueva venta: lo que más se usa, varias veces al día --}}
+        <a href="{{ route('store.sales.create') }}"
+           class="nav-link {{ request()->routeIs('store.sales.create') ? 'active' : 'inactive' }}">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            <span>Nueva venta</span>
+        </a>
+
+        {{-- 2. Inventario: se revisa varias veces al día (stock, precios) --}}
         <a href="{{ route('store.products.index') }}"
            class="nav-link {{ request()->routeIs('store.products.*') ? 'active' : 'inactive' }}">
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -256,24 +176,7 @@ class="fixed top-0 left-0 h-full w-72 z-50 flex flex-col border-r border-white/5
             <span>Inventario</span>
         </a>
 
-        <a href="{{ route('store.sales.create') }}"
-           class="nav-link {{ request()->routeIs('store.sales.create') ? 'active' : 'inactive' }}">
-            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M12 4v16m8-8H4"/>
-            </svg>
-            <span>Nueva venta</span>
-        </a>
-
-        <a href="{{ route('store.sales.index') }}"
-           class="nav-link {{ request()->routeIs('store.sales.index') || request()->routeIs('store.sales.show') ? 'active' : 'inactive' }}">
-            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-            </svg>
-            <span>Historial ventas</span>
-        </a>
-
+        {{-- 3. Clientes / Fiados: consulta diaria de deudas --}}
         <a href="{{ route('store.customers.index') }}"
            class="nav-link {{ request()->routeIs('store.customers.*') ? 'active' : 'inactive' }}">
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -283,6 +186,17 @@ class="fixed top-0 left-0 h-full w-72 z-50 flex flex-col border-r border-white/5
             <span>Clientes / Fiados</span>
         </a>
 
+        {{-- 4. Historial de ventas: consulta puntual, menos frecuente --}}
+        <a href="{{ route('store.sales.index') }}"
+           class="nav-link {{ request()->routeIs('store.sales.index') || request()->routeIs('store.sales.show') ? 'active' : 'inactive' }}">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+            <span>Historial ventas</span>
+        </a>
+
+        {{-- 5. Reportes: se mira de vez en cuando, no a diario --}}
         <a href="{{ route('store.reports.index') }}"
            class="nav-link {{ request()->routeIs('store.reports.*') ? 'active' : 'inactive' }}">
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -292,34 +206,49 @@ class="fixed top-0 left-0 h-full w-72 z-50 flex flex-col border-r border-white/5
             <span>Reportes</span>
         </a>
 
-        <div class="pt-4 mt-3 border-t sidebar-divider space-y-2">
-            <p class="section-title mb-3">
-Configuracion
-</p>
+        {{-- 6. Empleados: configuración ocasional, misma tienda, sin separador --}}
+        <a href="{{ route('store.users.index') }}"
+           class="nav-link {{ request()->routeIs('store.users.*') ? 'active' : 'inactive' }}">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+            <span>Empleados</span>
+        </a>
 
-            <a href="{{ route('store.users.index') }}"
-               class="nav-link {{ request()->routeIs('store.users.*') ? 'active' : 'inactive' }}">
-                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                </svg>
-                <span>Empleados</span>
-            </a>
+        {{-- 7. Categorías: lo menos usado, se configura una vez --}}
+        <a href="{{ route('store.categories.index') }}"
+           class="nav-link {{ request()->routeIs('store.categories.*') ? 'active' : 'inactive' }}">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+            </svg>
+            <span>Categorías</span>
+        </a>
 
-            <a href="{{ route('store.categories.index') }}"
-               class="nav-link {{ request()->routeIs('store.categories.*') ? 'active' : 'inactive' }}">
-                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
-                </svg>
-                <span>Categorías</span>
-            </a>
-        </div>
+        {{-- 7. proveedores --}}
+        <a href="{{ route('store.suppliers.index') }}"
+           class="nav-link {{ request()->routeIs('store.suppliers.*') ? 'active' : 'inactive' }}">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+            </svg>
+            <span>Proveedores</span>
+        </a>
+
+        {{-- 7. compras --}}
+        <a href="{{ route('store.purchases.index') }}"
+           class="nav-link {{ request()->routeIs('store.purchases.*') ? 'active' : 'inactive' }}">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+            </svg>
+            <span>Compras</span>
+        </a>
     </nav>
 
     {{-- Footer sidebar --}}
-    <div class="p-4 space-y-3">
-    <div class="sidebar-divider mb-3"></div>
+    <div class="p-4 space-y-2">
         <a href="{{ route('owner.stores.index') }}" class="nav-link inactive">
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -345,7 +274,6 @@ Configuracion
 
     {{-- Topbar --}}
     <header class="bg-white border-b border-slate-200 px-4 lg:px-6 py-3 flex justify-between items-center sticky top-0 z-30 shadow-sm">
-        {{-- Botón hamburguesa (solo móvil) --}}
         <div class="flex items-center gap-3">
             <button id="hamburger-btn"
                     onclick="toggleSidebar()"
@@ -415,7 +343,6 @@ Configuracion
 </div>
 
 <script>
-// ── Sidebar hamburguesa ──────────────────────────────────
 function openSidebar() {
     document.getElementById('sidebar').classList.add('open');
     document.getElementById('hamburger-btn').classList.add('open');
@@ -435,28 +362,25 @@ function closeSidebar() {
 function toggleSidebar() {
     document.getElementById('sidebar').classList.contains('open') ? closeSidebar() : openSidebar();
 }
-// Cerrar con swipe hacia la izquierda
+
 let touchStartX = 0;
 document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
 document.addEventListener('touchend', e => {
     if (touchStartX > 20 && e.changedTouches[0].clientX < touchStartX - 60) closeSidebar();
 });
 
-// Cerrar sidebar al hacer clic en un link (solo móvil)
 document.querySelectorAll('#sidebar a, #sidebar button[type="submit"]').forEach(el => {
     el.addEventListener('click', () => {
         if (window.innerWidth < 1024) closeSidebar();
     });
 });
 
-// ── Service Worker ──────────────────────────────────────
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js').catch(() => {});
     });
 }
 
-// ── Estado de conexión ──────────────────────────────────
 function updateOnlineStatus() {
     const el = document.getElementById('online-indicator');
     if (navigator.onLine) {

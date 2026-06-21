@@ -30,4 +30,15 @@ class Store extends Model
     public function inventoryLogs() {
         return $this->hasMany(InventoryLog::class);
     }
+
+    // ── Nuevo: proveedores y compras ──────────────────────
+    public function suppliers() {
+        return $this->hasMany(Supplier::class);
+    }
+    public function purchases() {
+        return $this->hasMany(Purchase::class);
+    }
+    public function supplierPayments() {
+        return $this->hasMany(SupplierPayment::class);
+    }
 }

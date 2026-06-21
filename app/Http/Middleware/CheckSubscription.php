@@ -32,14 +32,20 @@ class CheckSubscription
                 ? now()->diffInDays($subscription->end_date)
                 : null;
 
+            // Compartir estado inactivo para vistas que se rendericen
+            // antes del redirect (por si acaso)
+            view()->share('subscriptionActive', false);
+
             return redirect()->route('subscription.expired')
                              ->with('days_expired', $daysExpired)
                              ->with('store_name', session('store_name', 'tu tienda'));
         }
 
-        // Pasar los días restantes a la vista
-        $daysLeft = now()->diffInDays($subscription->end_date, false);
+        // Pasar los días restantes y el estado real a la vista
+        // (int) trunca cualquier decimal, mostrando siempre un número entero limpio
+        $daysLeft = (int) floor(now()->diffInDays($subscription->end_date, false));
         view()->share('subscriptionDaysLeft', $daysLeft);
+        view()->share('subscriptionActive', true);
 
         return $next($request);
     }

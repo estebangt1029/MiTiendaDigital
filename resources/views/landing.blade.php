@@ -1,314 +1,1161 @@
-<!DOCTYPE html>
-<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MiTiendaDigital — Gestión para tiendas de barrio</title>
+
+    <title>MiTiendaDigital | Sistema POS para Tiendas de Barrio</title>
+
+    <meta name="description"
+          content="Controla inventario, ventas, clientes y fiados desde cualquier lugar. Sistema POS moderno para tiendas de barrio.">
+
     <script src="https://cdn.tailwindcss.com"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-        * { font-family: 'Inter', sans-serif; }
-        .gradient-text {
-            background: linear-gradient(135deg, #6366f1, #8b5cf6, #a78bfa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+
+        *{
+            font-family:'Inter',sans-serif;
         }
-        .card-hover { transition: transform 0.2s, box-shadow 0.2s; }
-        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(99,102,241,0.15); }
-        .glow { box-shadow: 0 0 40px rgba(99,102,241,0.3); }
-        html { scroll-behavior: smooth; }
+
+        html{
+            scroll-behavior:smooth;
+        }
+
+        body{
+            background:#020617;
+            color:white;
+            overflow-x:hidden;
+        }
+
+        :root{
+            --primary:#6366f1;
+            --primary-light:#818cf8;
+            --card:#0f172a;
+            --border:rgba(255,255,255,.08);
+        }
+
+        .gradient-text{
+            background:linear-gradient(
+                135deg,
+                #6366f1,
+                #8b5cf6,
+                #a78bfa
+            );
+
+            -webkit-background-clip:text;
+            -webkit-text-fill-color:transparent;
+        }
+
+        .glass{
+            backdrop-filter:blur(16px);
+            background:rgba(15,23,42,.65);
+            border:1px solid rgba(255,255,255,.08);
+        }
+
+        .card-hover{
+            transition:.3s ease;
+        }
+
+        .card-hover:hover{
+            transform:translateY(-6px);
+            border-color:rgba(99,102,241,.4);
+            box-shadow:
+            0 20px 50px rgba(99,102,241,.15);
+        }
+
+        .glow{
+            box-shadow:
+            0 0 30px rgba(99,102,241,.25);
+        }
+
+        .hero-grid{
+            background-image:
+            linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+
+            background-size:40px 40px;
+        }
+
+        .pricing-popular{
+            background:
+            linear-gradient(
+            180deg,
+            rgba(99,102,241,.18),
+            rgba(15,23,42,.95)
+            );
+        }
+
+        .section-divider{
+            height:1px;
+
+            background:
+            linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,.12),
+            transparent
+            );
+        }
+
+        .mobile-menu{
+            transition:.3s ease;
+        }
+
+        .floating-blur{
+            position:absolute;
+            border-radius:999px;
+            filter:blur(120px);
+            opacity:.25;
+            pointer-events:none;
+        }
+
+        .btn-primary{
+            background:linear-gradient(
+            135deg,
+            #6366f1,
+            #8b5cf6
+            );
+
+            transition:.25s ease;
+        }
+
+        .btn-primary:hover{
+            transform:translateY(-2px);
+            box-shadow:
+            0 10px 30px rgba(99,102,241,.35);
+        }
+
+        .btn-secondary{
+            border:1px solid rgba(255,255,255,.1);
+            background:rgba(255,255,255,.03);
+            transition:.25s ease;
+        }
+
+        .btn-secondary:hover{
+            background:rgba(255,255,255,.06);
+        }
+
+        @media(max-width:768px){
+
+            .hero-title{
+                font-size:2.8rem !important;
+                line-height:1.05;
+            }
+
+            .hero-subtitle{
+                font-size:1rem;
+            }
+        }
     </style>
 </head>
-<body class="bg-gray-950 text-gray-100">
 
-    {{-- NAV --}}
-    <nav class="fixed top-0 w-full z-50 bg-gray-950/80 backdrop-blur-xl border-b border-gray-800">
-        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/>
+<nav
+x-data="{open:false}"
+class="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-slate-950/80 backdrop-blur-xl">
+
+    <div class="max-w-7xl mx-auto px-6">
+
+        <div class="h-20 flex items-center justify-between">
+
+            <a href="#"
+               class="flex items-center gap-3">
+
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
+
+                    <svg
+                    class="w-5 h-5 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24">
+
+                        <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16"/>
                     </svg>
+
                 </div>
-                <span class="font-bold text-white text-lg">MiTiendaDigital</span>
-            </div>
-            <div class="hidden md:flex items-center gap-8 text-sm text-gray-400">
-                <a href="#features" class="hover:text-white transition-colors">Funciones</a>
-                <a href="#pricing" class="hover:text-white transition-colors">Precios</a>
-                <a href="#faq" class="hover:text-white transition-colors">Preguntas</a>
-            </div>
-            <div class="flex items-center gap-3">
-                <a href="{{ route('owner.login') }}"
-                   class="text-sm text-gray-400 hover:text-white transition-colors">
-                    Iniciar sesión
+
+                <div>
+                    <p class="font-bold text-white">
+                        MiTiendaDigital
+                    </p>
+
+                    <p class="text-xs text-slate-500">
+                        Sistema POS
+                    </p>
+                </div>
+
+            </a>
+
+            <div class="hidden md:flex items-center gap-8 text-sm">
+
+                <a href="#features" class="text-slate-400 hover:text-white">
+                    Funciones
                 </a>
-                <a href="{{ route('register') }}"
-                   class="bg-indigo-600 hover:bg-indigo-500 text-white text-sm px-4 py-2 rounded-lg font-medium transition-colors">
+
+                <a href="#pricing" class="text-slate-400 hover:text-white">
+                    Precios
+                </a>
+
+                <a href="#faq" class="text-slate-400 hover:text-white">
+                    FAQ
+                </a>
+
+            </div>
+
+            <div class="hidden md:flex items-center gap-3">
+
+                <a
+                href="{{ route('owner.login') }}"
+                class="text-slate-400 hover:text-white">
+
+                    Ingresar
+                </a>
+
+                <a
+                href="{{ route('register') }}"
+                class="btn-primary px-5 py-2.5 rounded-xl text-white font-medium">
+
                     Empezar gratis
                 </a>
-            </div>
-        </div>
-    </nav>
 
-    {{-- HERO --}}
-    <section class="pt-32 pb-20 px-6">
-        <div class="max-w-4xl mx-auto text-center">
-            <div class="inline-flex items-center gap-2 bg-indigo-950 border border-indigo-800 text-indigo-300 text-xs px-4 py-2 rounded-full mb-8">
-                <span class="w-2 h-2 bg-indigo-400 rounded-full animate-pulse"></span>
-                Sistema 100% en la nube · Funciona sin internet
             </div>
-            <h1 class="text-5xl md:text-7xl font-black text-white mb-6 leading-tight">
-                Tu tienda,<br>
-                <span class="gradient-text">digitalizada</span>
-            </h1>
-            <p class="text-xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-                Control total de inventario, clientes, ventas y deudas para tu tienda de barrio.
-                Desde el celular, sin internet, sin complicaciones.
+
+            <button
+            @click="open=!open"
+            class="md:hidden">
+
+                <svg class="w-7 h-7"
+                     fill="none"
+                     stroke="currentColor"
+                     viewBox="0 0 24 24">
+
+                    <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+
+            </button>
+
+        </div>
+
+        <div
+        x-show="open"
+        x-transition
+        class="md:hidden pb-6 space-y-4">
+
+            <a href="#features" class="block text-slate-300">
+                Funciones
+            </a>
+
+            <a href="#pricing" class="block text-slate-300">
+                Precios
+            </a>
+
+            <a href="#faq" class="block text-slate-300">
+                Preguntas
+            </a>
+
+            <a href="{{ route('owner.login') }}"
+               class="block text-slate-300">
+
+                Iniciar sesión
+            </a>
+
+            <a href="{{ route('register') }}"
+               class="block btn-primary text-center py-3 rounded-xl text-white">
+
+                Empezar gratis
+            </a>
+
+        </div>
+
+    </div>
+
+</nav>
+
+<section class="relative overflow-hidden pt-36 pb-24 hero-grid">
+
+    <div class="floating-blur w-96 h-96 bg-indigo-500 top-0 left-0"></div>
+    <div class="floating-blur w-96 h-96 bg-violet-500 bottom-0 right-0"></div>
+
+    <div class="max-w-7xl mx-auto px-6">
+
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+
+            {{-- TEXTO --}}
+            <div>
+
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-indigo-500/20 bg-indigo-500/10 text-indigo-300 text-sm mb-8">
+
+                    <span class="w-2 h-2 bg-indigo-400 rounded-full animate-pulse"></span>
+
+                    Sistema POS moderno para tiendas de barrio
+
+                </div>
+
+                <h1 class="hero-title text-5xl lg:text-7xl font-black leading-tight mb-6">
+
+                    Controla tu
+
+                    <span class="gradient-text">
+                        tienda
+                    </span>
+
+                    desde cualquier lugar.
+
+                </h1>
+
+                <p class="hero-subtitle text-xl text-slate-400 leading-relaxed mb-10 max-w-xl">
+
+                    Inventario, ventas, clientes, fiados y reportes
+                    en una sola plataforma.
+
+                    Accede desde tu celular, tablet o computador.
+
+                </p>
+
+                <div class="flex flex-col sm:flex-row gap-4">
+
+                    <a
+                    href="{{ route('register') }}"
+                    class="btn-primary px-8 py-4 rounded-2xl font-semibold text-center">
+
+                        Empezar ahora
+
+                    </a>
+
+                    <a
+                    href="#features"
+                    class="btn-secondary px-8 py-4 rounded-2xl text-center">
+
+                        Ver funciones
+
+                    </a>
+
+                </div>
+
+                <div class="grid grid-cols-3 gap-6 mt-12">
+
+                    <div>
+
+                        <p class="text-3xl font-black text-white">
+                            24/7
+                        </p>
+
+                        <p class="text-sm text-slate-500">
+                            Disponible
+                        </p>
+
+                    </div>
+
+                    <div>
+
+                        <p class="text-3xl font-black text-white">
+                            PWA
+                        </p>
+
+                        <p class="text-sm text-slate-500">
+                            Instalable
+                        </p>
+
+                    </div>
+
+                    <div>
+
+                        <p class="text-3xl font-black text-white">
+                            Cloud
+                        </p>
+
+                        <p class="text-sm text-slate-500">
+                            En la nube
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {{-- MOCKUP --}}
+            <div class="relative">
+
+                <div class="glass rounded-3xl p-4 border border-white/10 shadow-2xl">
+
+                    <div class="flex items-center gap-2 mb-4">
+
+                        <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-green-500"></div>
+
+                    </div>
+
+                    <div class="bg-slate-950 rounded-2xl overflow-hidden">
+
+                        <div class="grid grid-cols-12 min-h-[500px]">
+
+                            {{-- SIDEBAR --}}
+                            <div class="col-span-4 border-r border-white/5 p-4">
+
+                                <div class="bg-indigo-500/10 border border-indigo-500/20 rounded-2xl p-3 mb-4">
+
+                                    <p class="text-xs text-slate-500">
+                                        Tienda activa
+                                    </p>
+
+                                    <p class="font-bold text-white">
+                                        Tienda Alegría
+                                    </p>
+
+                                </div>
+
+                                <div class="space-y-3">
+
+                                    <div class="bg-indigo-500/15 border border-indigo-500/20 rounded-xl px-3 py-2 text-indigo-300">
+                                        Inventario
+                                    </div>
+
+                                    <div class="px-3 py-2 text-slate-400">
+                                        Nueva venta
+                                    </div>
+
+                                    <div class="px-3 py-2 text-slate-400">
+                                        Clientes
+                                    </div>
+
+                                    <div class="px-3 py-2 text-slate-400">
+                                        Reportes
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            {{-- CONTENIDO --}}
+                            <div class="col-span-8 p-5">
+
+                                <div class="flex justify-between items-center mb-5">
+
+                                    <h3 class="font-bold">
+                                        Inventario
+                                    </h3>
+
+                                    <button class="bg-indigo-600 px-3 py-1 rounded-lg text-sm">
+                                        Nuevo
+                                    </button>
+
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3 mb-5">
+
+                                    <div class="bg-slate-900 rounded-xl p-3">
+
+                                        <p class="text-slate-500 text-xs">
+                                            Productos
+                                        </p>
+
+                                        <p class="font-bold text-xl">
+                                            245
+                                        </p>
+
+                                    </div>
+
+                                    <div class="bg-slate-900 rounded-xl p-3">
+
+                                        <p class="text-slate-500 text-xs">
+                                            Ventas Hoy
+                                        </p>
+
+                                        <p class="font-bold text-xl">
+                                            $520k
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="space-y-3">
+
+                                    @for($i=0;$i<5;$i++)
+
+                                    <div class="bg-slate-900 rounded-xl p-3 flex justify-between">
+
+                                        <div>
+
+                                            <div class="h-3 w-24 bg-slate-700 rounded"></div>
+
+                                            <div class="h-2 w-16 bg-slate-800 rounded mt-2"></div>
+
+                                        </div>
+
+                                        <div class="h-6 w-12 rounded-full bg-emerald-500/20"></div>
+
+                                    </div>
+
+                                    @endfor
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="py-16">
+
+    <div class="max-w-6xl mx-auto px-6">
+
+        <div class="grid md:grid-cols-4 gap-6">
+
+            <div class="glass rounded-2xl p-6">
+
+                <h3 class="font-bold mb-2">
+                    Inventario Inteligente
+                </h3>
+
+                <p class="text-slate-400 text-sm">
+                    Control total del stock en tiempo real.
+                </p>
+
+            </div>
+
+            <div class="glass rounded-2xl p-6">
+
+                <h3 class="font-bold mb-2">
+                    Clientes y Fiados
+                </h3>
+
+                <p class="text-slate-400 text-sm">
+                    Lleva el control de cada deuda fácilmente.
+                </p>
+
+            </div>
+
+            <div class="glass rounded-2xl p-6">
+
+                <h3 class="font-bold mb-2">
+                    Reportes
+                </h3>
+
+                <p class="text-slate-400 text-sm">
+                    Conoce exactamente cuánto vende tu negocio.
+                </p>
+
+            </div>
+
+            <div class="glass rounded-2xl p-6">
+
+                <h3 class="font-bold mb-2">
+                    Multiplataforma
+                </h3>
+
+                <p class="text-slate-400 text-sm">
+                    Funciona en celular, tablet y computador.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<div class="max-w-7xl mx-auto">
+
+    <div class="text-center mb-20">
+
+        <span class="text-indigo-400 font-semibold">
+            FUNCIONES
+        </span>
+
+        <h2 class="text-4xl md:text-5xl font-black mt-4 mb-6">
+            Todo lo que necesita una tienda moderna
+        </h2>
+
+        <p class="text-slate-400 max-w-2xl mx-auto text-lg">
+            Diseñado para que puedas controlar ventas,
+            inventario, clientes y fiados desde cualquier lugar.
+        </p>
+
+    </div>
+
+    <div class="grid lg:grid-cols-3 gap-6">
+
+        <div class="glass rounded-3xl p-8 card-hover">
+
+            <div class="w-14 h-14 rounded-2xl bg-indigo-500/15 flex items-center justify-center mb-6">
+
+                📦
+
+            </div>
+
+            <h3 class="text-xl font-bold mb-3">
+                Inventario Inteligente
+            </h3>
+
+            <p class="text-slate-400">
+                Controla existencias, entradas,
+                salidas y alertas de stock bajo.
             </p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="{{ route('register') }}"
-                   class="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all glow">
-                    Comenzar ahora — $3.500/día
-                </a>
-                <a href="#features"
-                   class="border border-gray-700 hover:border-gray-500 text-gray-300 hover:text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all">
-                    Ver funciones ↓
-                </a>
-            </div>
-            <p class="text-gray-600 text-sm mt-6">Sin tarjeta de crédito · Activación en minutos · Soporte por WhatsApp</p>
-        </div>
-    </section>
 
-    {{-- STATS --}}
-    <section class="py-12 px-6 border-y border-gray-800 bg-gray-900/50">
-        <div class="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            @foreach([
-                ['number' => '100%', 'label' => 'En la nube'],
-                ['number' => 'PWA',  'label' => 'Instala en tu celular'],
-                ['number' => '24/7', 'label' => 'Disponible siempre'],
-                ['number' => '∞',    'label' => 'Productos y clientes'],
-            ] as $stat)
+        </div>
+
+        <div class="glass rounded-3xl p-8 card-hover">
+
+            <div class="w-14 h-14 rounded-2xl bg-violet-500/15 flex items-center justify-center mb-6">
+
+                💰
+
+            </div>
+
+            <h3 class="text-xl font-bold mb-3">
+                Ventas Rápidas
+            </h3>
+
+            <p class="text-slate-400">
+                Registra ventas en segundos y calcula
+                cambios automáticamente.
+            </p>
+
+        </div>
+
+        <div class="glass rounded-3xl p-8 card-hover">
+
+            <div class="w-14 h-14 rounded-2xl bg-purple-500/15 flex items-center justify-center mb-6">
+
+                👥
+
+            </div>
+
+            <h3 class="text-xl font-bold mb-3">
+                Clientes y Fiados
+            </h3>
+
+            <p class="text-slate-400">
+                Lleva control completo de deudas,
+                pagos y movimientos.
+            </p>
+
+        </div>
+
+        <div class="glass rounded-3xl p-8 card-hover">
+
+            <div class="w-14 h-14 rounded-2xl bg-indigo-500/15 flex items-center justify-center mb-6">
+
+                📊
+
+            </div>
+
+            <h3 class="text-xl font-bold mb-3">
+                Reportes
+            </h3>
+
+            <p class="text-slate-400">
+                Conoce tus ventas diarias,
+                semanales y mensuales.
+            </p>
+
+        </div>
+
+        <div class="glass rounded-3xl p-8 card-hover">
+
+            <div class="w-14 h-14 rounded-2xl bg-violet-500/15 flex items-center justify-center mb-6">
+
+                👨‍💼
+
+            </div>
+
+            <h3 class="text-xl font-bold mb-3">
+                Empleados
+            </h3>
+
+            <p class="text-slate-400">
+                Crea cuentas para cajeros,
+                administradores y vendedores.
+            </p>
+
+        </div>
+
+        <div class="glass rounded-3xl p-8 card-hover">
+
+            <div class="w-14 h-14 rounded-2xl bg-purple-500/15 flex items-center justify-center mb-6">
+
+                📱
+
+            </div>
+
+            <h3 class="text-xl font-bold mb-3">
+                Funciona Sin Internet
+            </h3>
+
+            <p class="text-slate-400">
+                Sigue vendiendo incluso cuando
+                falla la conexión.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+<section id="pricing" class="py-32">
+
+    <div class="max-w-7xl mx-auto px-6">
+
+        <div class="text-center mb-20">
+
+            <span class="text-indigo-400 font-semibold">
+                PRECIOS
+            </span>
+
+            <h2 class="text-5xl font-black mt-4 mb-6">
+                Planes simples
+            </h2>
+
+            <p class="text-slate-400 text-lg">
+                Paga solo el tiempo que necesites.
+            </p>
+
+        </div>
+
+        <div class="grid lg:grid-cols-4 gap-6">
+
+            <!-- MES -->
+
+            <div class="glass rounded-3xl p-8">
+
+                <h3 class="font-bold text-xl mb-4">
+                    1 Mes
+                </h3>
+
+                <div class="mb-8">
+
+                    <span class="text-4xl font-black">
+                        $105.000
+                    </span>
+
+                </div>
+
+                <ul class="space-y-3 text-slate-300 mb-8">
+
+                    <li>✓ Inventario</li>
+                    <li>✓ Clientes</li>
+                    <li>✓ Fiados</li>
+                    <li>✓ Reportes</li>
+                    <li>✓ Soporte</li>
+
+                </ul>
+
+                <a href="{{ route('register') }}"
+                   class="block text-center btn-secondary py-3 rounded-xl">
+
+                    Elegir
+
+                </a>
+
+            </div>
+
+             <!-- 3 MESES -->
+
+            <div class="glass rounded-3xl p-8">
+
+                <h3 class="font-bold text-xl mb-4">
+                    3 Meses
+                </h3>
+
+                <div class="mb-8">
+
+                    <span class="text-4xl font-black">
+                        $300.000
+                    </span>
+
+                </div>
+
+                <ul class="space-y-3 text-slate-300 mb-8">
+
+                    <li>✓ Inventario</li>
+                    <li>✓ Clientes</li>
+                    <li>✓ Fiados</li>
+                    <li>✓ Reportes</li>
+                    <li>✓ Ahorro $15.000</li>
+
+                </ul>
+
+                <a href="{{ route('register') }}"
+                   class="block text-center btn-secondary py-3 rounded-xl">
+
+                    Elegir
+
+                </a>
+
+            </div>
+
+            <!-- POPULAR -->
+
+            <div class="pricing-popular rounded-3xl p-8 border border-indigo-500 relative scale-105">
+
+                <div class="absolute top-0 right-0 bg-indigo-500 text-white text-xs px-3 py-1 rounded-bl-xl rounded-tr-3xl">
+
+                    MÁS POPULAR
+
+                </div>
+
+                <h3 class="font-bold text-xl mb-4">
+                    6 Meses
+                </h3>
+
+                <div class="mb-8">
+
+                    <span class="text-5xl font-black">
+                        $600.000
+                    </span>
+
+                </div>
+
+                <ul class="space-y-3 mb-8">
+
+                    <li>✓ Inventario</li>
+                    <li>✓ Clientes</li>
+                    <li>✓ Fiados</li>
+                    <li>✓ Reportes</li>
+                    <li>✓ Soporte</li>
+                    <li>✓ 10% descuento</li>
+
+                </ul>
+
+                <a href="{{ route('register') }}"
+                   class="block text-center btn-primary py-3 rounded-xl">
+
+                    Elegir Plan
+
+                </a>
+
+            </div>
+
+           
+
+            <!-- AÑO -->
+
+            <div class="glass rounded-3xl p-8">
+
+                <h3 class="font-bold text-xl mb-4">
+                    1 Año
+                </h3>
+
+                <div class="mb-8">
+
+                    <span class="text-4xl font-black">
+                        $1.200.000
+                    </span>
+
+                </div>
+
+                <ul class="space-y-3 text-slate-300 mb-8">
+
+                    <li>✓ Inventario</li>
+                    <li>✓ Clientes</li>
+                    <li>✓ Fiados</li>
+                    <li>✓ Reportes</li>
+                    <li>✓ 17% descuento</li>
+
+                </ul>
+
+                <a href="{{ route('register') }}"
+                   class="block text-center btn-secondary py-3 rounded-xl">
+
+                    Elegir
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section id="faq" class="py-32">
+
+    <div class="max-w-4xl mx-auto px-6">
+
+        <div class="text-center mb-20">
+
+            <span class="text-indigo-400 font-semibold">
+                PREGUNTAS FRECUENTES
+            </span>
+
+            <h2 class="text-5xl font-black mt-4 mb-6">
+                Resolvemos tus dudas
+            </h2>
+
+            <p class="text-slate-400">
+                Todo lo que necesitas saber antes de empezar.
+            </p>
+
+        </div>
+
+        <div class="space-y-4">
+
+            <details class="glass rounded-2xl p-6 group">
+
+                <summary class="cursor-pointer font-semibold flex justify-between items-center list-none">
+
+                    ¿Necesito internet para usar el sistema?
+
+                    <span class="group-open:rotate-45 transition">
+                        +
+                    </span>
+
+                </summary>
+
+                <p class="mt-4 text-slate-400">
+                    No. Puedes instalar la aplicación y seguir trabajando.
+                    Cuando vuelva la conexión los datos se sincronizan.
+                </p>
+
+            </details>
+
+            <details class="glass rounded-2xl p-6 group">
+
+                <summary class="cursor-pointer font-semibold flex justify-between items-center list-none">
+
+                    ¿Puedo tener empleados?
+
+                    <span class="group-open:rotate-45 transition">
+                        +
+                    </span>
+
+                </summary>
+
+                <p class="mt-4 text-slate-400">
+                    Sí. Puedes crear usuarios con permisos diferentes.
+                </p>
+
+            </details>
+
+            <details class="glass rounded-2xl p-6 group">
+
+                <summary class="cursor-pointer font-semibold flex justify-between items-center list-none">
+
+                    ¿Cómo realizo los pagos?
+
+                    <span class="group-open:rotate-45 transition">
+                        +
+                    </span>
+
+                </summary>
+
+                <p class="mt-4 text-slate-400">
+                    Nequi, Daviplata o transferencia bancaria.
+                </p>
+
+            </details>
+
+            <details class="glass rounded-2xl p-6 group">
+
+                <summary class="cursor-pointer font-semibold flex justify-between items-center list-none">
+
+                    ¿Hay permanencia mínima?
+
+                    <span class="group-open:rotate-45 transition">
+                        +
+                    </span>
+
+                </summary>
+
+                <p class="mt-4 text-slate-400">
+                    No. Puedes cancelar cuando quieras.
+                </p>
+
+            </details>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="py-32">
+
+    <div class="max-w-7xl mx-auto px-6">
+
+        <div class="text-center mb-20">
+
+            <span class="text-indigo-400 font-semibold">
+                TESTIMONIOS
+            </span>
+
+            <h2 class="text-5xl font-black mt-4">
+                Pensado para dueños de tienda
+            </h2>
+
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-6">
+
+            <div class="glass rounded-3xl p-8">
+
+                <p class="text-slate-300 mb-6">
+                    "Ahora sé exactamente cuánto vendo cada día."
+                </p>
+
                 <div>
-                    <p class="text-3xl font-black text-indigo-400">{{ $stat['number'] }}</p>
-                    <p class="text-gray-500 text-sm mt-1">{{ $stat['label'] }}</p>
+                    <p class="font-semibold">
+                        Próximamente
+                    </p>
+
+                    <p class="text-slate-500 text-sm">
+                        Dueño de tienda
+                    </p>
                 </div>
-            @endforeach
-        </div>
-    </section>
 
-    {{-- FEATURES --}}
-    <section id="features" class="py-24 px-6">
-        <div class="max-w-6xl mx-auto">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl font-black text-white mb-4">Todo lo que necesitas</h2>
-                <p class="text-gray-400 text-lg">Un sistema completo pensado para tiendas de barrio colombianas</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                @foreach([
-                    [
-                        'icon'  => '📦',
-                        'title' => 'Inventario inteligente',
-                        'desc'  => 'Controla tu stock en tiempo real. Alertas automáticas cuando un producto se está acabando. Registro de entradas de proveedor.',
-                        'color' => 'indigo',
-                    ],
-                    [
-                        'icon'  => '👥',
-                        'title' => 'Clientes y fiados',
-                        'desc'  => 'Registra tus clientes y lleva el control de quién te debe y cuánto. Historial completo de abonos y pagos.',
-                        'color' => 'violet',
-                    ],
-                    [
-                        'icon'  => '🛒',
-                        'title' => 'Ventas rápidas',
-                        'desc'  => 'Registra ventas de contado o fiado en segundos. Calcula el cambio automáticamente. Compatible con lector de barras.',
-                        'color' => 'purple',
-                    ],
-                    [
-                        'icon'  => '📊',
-                        'title' => 'Reportes y gráficas',
-                        'desc'  => 'Ve cuánto vendiste hoy, esta semana o este mes. Conoce tus productos más vendidos y clientes con más deuda.',
-                        'color' => 'indigo',
-                    ],
-                    [
-                        'icon'  => '👨‍💼',
-                        'title' => 'Múltiples empleados',
-                        'desc'  => 'Crea usuarios para tus empleados con roles distintos: cajero, inventario o administrador. Cada uno ve solo lo que necesita.',
-                        'color' => 'violet',
-                    ],
-                    [
-                        'icon'  => '📱',
-                        'title' => 'Funciona sin internet',
-                        'desc'  => 'Instala la app en tu celular Android. Si se cae el internet, sigue vendiendo. Los datos se sincronizan solos cuando vuelve.',
-                        'color' => 'purple',
-                    ],
-                ] as $feature)
-                    <div class="card-hover bg-gray-900 border border-gray-800 rounded-2xl p-6">
-                        <span class="text-4xl mb-4 block">{{ $feature['icon'] }}</span>
-                        <h3 class="text-white font-bold text-lg mb-2">{{ $feature['title'] }}</h3>
-                        <p class="text-gray-400 text-sm leading-relaxed">{{ $feature['desc'] }}</p>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-    </section>
+            <div class="glass rounded-3xl p-8">
 
-    {{-- HOW IT WORKS --}}
-    <section class="py-24 px-6 bg-gray-900/50">
-        <div class="max-w-4xl mx-auto">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl font-black text-white mb-4">¿Cómo funciona?</h2>
-                <p class="text-gray-400">En menos de 10 minutos tu tienda está lista</p>
-            </div>
-
-            <div class="space-y-6">
-                @foreach([
-                    ['step' => '01', 'title' => 'Regístrate',         'desc' => 'Crea tu cuenta con el nombre de tu tienda y elige el plan que más te convenga.'],
-                    ['step' => '02', 'title' => 'Paga y activa',      'desc' => 'Paga por Nequi o transferencia. Te activamos la tienda en minutos por WhatsApp.'],
-                    ['step' => '03', 'title' => 'Carga tu inventario','desc' => 'Agrega tus productos con precios y stock inicial. Puedes escanear códigos de barras.'],
-                    ['step' => '04', 'title' => 'Empieza a vender',   'desc' => 'Registra tus ventas, controla fiados y mira cómo crece tu negocio en tiempo real.'],
-                ] as $step)
-                    <div class="flex gap-6 items-start">
-                        <div class="w-12 h-12 rounded-xl bg-indigo-600/20 border border-indigo-600/30 flex items-center justify-center flex-shrink-0">
-                            <span class="text-indigo-400 font-black text-sm">{{ $step['step'] }}</span>
-                        </div>
-                        <div class="pt-2">
-                            <h3 class="text-white font-bold text-lg mb-1">{{ $step['title'] }}</h3>
-                            <p class="text-gray-400">{{ $step['desc'] }}</p>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-    </section>
-
-    {{-- PRICING --}}
-    <section id="pricing" class="py-24 px-6">
-        <div class="max-w-5xl mx-auto">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl font-black text-white mb-4">Precios transparentes</h2>
-                <p class="text-gray-400 text-lg">$3.500 por día · Sin costos ocultos · Cancela cuando quieras</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                @foreach([
-                    ['plan' => '1_month',  'label' => '1 mes',   'price' => 105000,  'daily' => 3500,  'saving' => null,  'popular' => false],
-                    ['plan' => '3_months', 'label' => '3 meses', 'price' => 294000,  'daily' => 3267,  'saving' => '7%',  'popular' => false],
-                    ['plan' => '6_months', 'label' => '6 meses', 'price' => 567000,  'daily' => 3150,  'saving' => '10%', 'popular' => true],
-                    ['plan' => '1_year',   'label' => '1 año',   'price' => 1050000, 'daily' => 2877,  'saving' => '17%', 'popular' => false],
-                ] as $p)
-                    <div class="relative card-hover rounded-2xl p-6 {{ $p['popular'] ? 'bg-indigo-600 border-2 border-indigo-400' : 'bg-gray-900 border border-gray-800' }}">
-                        @if($p['popular'])
-                            <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-indigo-400 text-indigo-950 text-xs font-bold px-3 py-1 rounded-full">
-                                MÁS POPULAR
-                            </div>
-                        @endif
-                        @if($p['saving'])
-                            <div class="text-xs font-semibold {{ $p['popular'] ? 'text-indigo-200' : 'text-indigo-400' }} mb-2">
-                                Ahorra {{ $p['saving'] }}
-                            </div>
-                        @endif
-                        <p class="font-bold text-lg {{ $p['popular'] ? 'text-white' : 'text-white' }} mb-1">{{ $p['label'] }}</p>
-                        <p class="text-3xl font-black {{ $p['popular'] ? 'text-white' : 'text-white' }}">
-                            ${{ number_format($p['price'], 0, ',', '.') }}
-                        </p>
-                        <p class="text-sm {{ $p['popular'] ? 'text-indigo-200' : 'text-gray-500' }} mt-1 mb-6">
-                            ${{ number_format($p['daily'], 0, ',', '.') }}/día
-                        </p>
-                        <a href="{{ route('register') }}?plan={{ $p['plan'] }}"
-                           class="block text-center py-2.5 rounded-xl font-semibold text-sm transition-all
-                                  {{ $p['popular'] ? 'bg-white text-indigo-600 hover:bg-indigo-50' : 'bg-indigo-600 hover:bg-indigo-500 text-white' }}">
-                            Elegir plan
-                        </a>
-                    </div>
-                @endforeach
-            </div>
-
-            <div class="mt-8 bg-gray-900 border border-gray-800 rounded-2xl p-6 text-center">
-                <p class="text-gray-400 text-sm">
-                    💳 Pagos por <strong class="text-white">Nequi, Daviplata o transferencia bancaria</strong> ·
-                    Activación en minutos · Soporte por WhatsApp
+                <p class="text-slate-300 mb-6">
+                    "El control de fiados me ahorra mucho tiempo."
                 </p>
+
+                <div>
+                    <p class="font-semibold">
+                        Próximamente
+                    </p>
+
+                    <p class="text-slate-500 text-sm">
+                        Comerciante
+                    </p>
+                </div>
+
             </div>
+
+            <div class="glass rounded-3xl p-8">
+
+                <p class="text-slate-300 mb-6">
+                    "Puedo revisar el negocio desde mi celular."
+                </p>
+
+                <div>
+                    <p class="font-semibold">
+                        Próximamente
+                    </p>
+
+                    <p class="text-slate-500 text-sm">
+                        Tendero
+                    </p>
+                </div>
+
+            </div>
+
         </div>
-    </section>
 
-    {{-- FAQ --}}
-    <section id="faq" class="py-24 px-6 bg-gray-900/50">
-        <div class="max-w-3xl mx-auto">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl font-black text-white mb-4">Preguntas frecuentes</h2>
-            </div>
+    </div>
 
-            <div class="space-y-4" x-data="{ open: null }">
-                @foreach([
-                    ['q' => '¿Necesito internet para usar el sistema?',
-                     'a' => 'No. Puedes instalar la app en tu celular y funciona sin internet. Cuando vuelve la conexión, los datos se sincronizan automáticamente.'],
-                    ['q' => '¿Cuántas tiendas puedo tener?',
-                     'a' => 'Puedes tener varias tiendas con una sola cuenta. Cada tienda tiene su propia suscripción mensual.'],
-                    ['q' => '¿Cómo pago el servicio?',
-                     'a' => 'Aceptamos Nequi, Daviplata y transferencia bancaria. Después de registrarte te enviamos los datos de pago por WhatsApp.'],
-                    ['q' => '¿Puedo tener empleados usando el sistema?',
-                     'a' => 'Sí. Puedes crear usuarios para tus empleados con roles diferentes: cajero, inventario o administrador.'],
-                    ['q' => '¿Qué pasa si no renuevo a tiempo?',
-                     'a' => 'El sistema te avisa con 7 días de anticipación. Si se vence, tu acceso se pausa pero tus datos quedan guardados. Al renovar todo vuelve a funcionar.'],
-                    ['q' => '¿Hay contrato o permanencia?',
-                     'a' => 'No. Pagas mes a mes y cancelas cuando quieras. Sin contratos ni letras pequeñas.'],
-                ] as $i => $faq)
-                    <details class="bg-gray-900 border border-gray-800 rounded-xl group">
-                        <summary class="px-6 py-4 cursor-pointer flex justify-between items-center text-white font-medium list-none">
-                            {{ $faq['q'] }}
-                            <svg class="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                            </svg>
-                        </summary>
-                        <p class="px-6 pb-4 text-gray-400 text-sm leading-relaxed">{{ $faq['a'] }}</p>
-                    </details>
-                @endforeach
-            </div>
-        </div>
-    </section>
+</section>
 
-    {{-- CTA FINAL --}}
-    <section class="py-24 px-6">
-        <div class="max-w-3xl mx-auto text-center">
-            <div class="bg-gradient-to-br from-indigo-950 to-gray-900 border border-indigo-800 rounded-3xl p-12">
-                <h2 class="text-4xl font-black text-white mb-4">
-                    ¿Listo para digitalizar<br>tu tienda?
+<section class="py-32">
+
+    <div class="max-w-5xl mx-auto px-6">
+
+        <div class="rounded-[32px] overflow-hidden relative">
+
+            <div class="absolute inset-0 bg-gradient-to-br from-indigo-600 via-violet-600 to-purple-700"></div>
+
+            <div class="relative p-12 md:p-20 text-center">
+
+                <h2 class="text-4xl md:text-6xl font-black mb-6">
+
+                    Empieza a controlar
+                    tu negocio hoy mismo
+
                 </h2>
-                <p class="text-gray-400 mb-8">
-                    Únete a los dueños de tienda que ya controlan su negocio desde el celular.
+
+                <p class="text-indigo-100 text-lg max-w-2xl mx-auto mb-10">
+
+                    Ventas, inventario, clientes,
+                    fiados y reportes desde una sola plataforma.
+
                 </p>
-                <a href="{{ route('register') }}"
-                   class="inline-block bg-indigo-600 hover:bg-indigo-500 text-white px-10 py-4 rounded-xl font-bold text-lg transition-all glow">
-                    Registrarme ahora
+
+                <a
+                href="{{ route('register') }}"
+                class="bg-white text-indigo-700 px-8 py-4 rounded-2xl font-bold inline-block hover:scale-105 transition">
+
+                    Crear mi tienda gratis
+
                 </a>
-                <p class="text-gray-600 text-sm mt-4">Activación en minutos · Soporte por WhatsApp</p>
-            </div>
-        </div>
-    </section>
 
-    {{-- FOOTER --}}
-    <footer class="border-t border-gray-800 py-8 px-6">
-        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-2">
-                <div class="w-6 h-6 rounded bg-indigo-600 flex items-center justify-center">
-                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/>
-                    </svg>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<footer class="border-t border-white/5 py-12">
+
+    <div class="max-w-7xl mx-auto px-6">
+
+        <div class="flex flex-col lg:flex-row justify-between items-center gap-6">
+
+            <div class="flex items-center gap-3">
+
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
+
+                    🏪
+
                 </div>
-                <span class="text-gray-400 text-sm font-medium">MiTiendaDigital</span>
-            </div>
-            <p class="text-gray-600 text-sm">© {{ date('Y') }} MiTiendaDigital · Hecho en Colombia 🇨🇴</p>
-            <div class="flex gap-6 text-sm text-gray-500">
-                <a href="{{ route('owner.login') }}" class="hover:text-gray-300">Iniciar sesión</a>
-                <a href="{{ route('register') }}" class="hover:text-gray-300">Registrarse</a>
-            </div>
-        </div>
-    </footer>
 
-</body>
-</html>
+                <div>
+
+                    <p class="font-bold">
+                        MiTiendaDigital
+                    </p>
+
+                    <p class="text-slate-500 text-sm">
+                        Sistema POS para tiendas
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="flex gap-6 text-slate-400 text-sm">
+
+                <a href="#features">Funciones</a>
+
+                <a href="#pricing">Precios</a>
+
+                <a href="#faq">FAQ</a>
+
+            </div>
+
+            <p class="text-slate-500 text-sm">
+
+                © {{ date('Y') }} MiTiendaDigital
+
+            </p>
+
+        </div>
+
+    </div>
+
+</footer>

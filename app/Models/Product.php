@@ -19,6 +19,11 @@ class Product extends Model
         return $this->hasMany(InventoryLog::class);
     }
 
+    // ── Nuevo ──────────────────────────────────────────────
+    public function purchaseItems() {
+        return $this->hasMany(PurchaseItem::class);
+    }
+
     public function isLowStock(): bool {
         return $this->stock <= $this->min_stock;
     }

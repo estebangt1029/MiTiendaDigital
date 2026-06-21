@@ -29,6 +29,11 @@ use App\Http\Controllers\Admin\OwnerController as AdminOwnerController;
 use App\Http\Controllers\Admin\StoreController as AdminStoreController;
 use App\Http\Controllers\Admin\SubscriptionController as AdminSubscriptionController;
 
+use App\Http\Controllers\Store\SupplierController;
+use App\Http\Controllers\Store\PurchaseController;
+use App\Http\Controllers\Store\SupplierPaymentController;
+
+
 // ─── Rutas públicas ────────────────────────────────────────
 Route::get('/', fn() => view('landing'))->name('landing');
 Route::get('/offline', fn() => view('offline'))->name('offline');
@@ -39,7 +44,7 @@ Route::post('/registro', [RegisterController::class, 'register']);
 // ─── Auth dueños ───────────────────────────────────────────
 Route::prefix('owner')->name('owner.')->group(function () {
     Route::get('login',   [OwnerAuthController::class, 'showLogin'])->name('login');
-    Route::post('login',  [OwnerAuthController::class, 'login']);
+    Route::post('login', [OwnerAuthController::class, 'login'])->middleware('throttle:5,1');
     Route::post('logout', [OwnerAuthController::class, 'logout'])->name('logout');
 
     Route::middleware('auth.owner')->group(function () {
@@ -97,6 +102,24 @@ Route::middleware(['auth.owner', 'check.subscription'])->prefix('tienda')->group
     Route::get('empleados/{storeUser}/editar', [StoreUserController::class, 'edit'])->name('store.users.edit');
     Route::put('empleados/{storeUser}',      [StoreUserController::class, 'update'])->name('store.users.update');
     Route::delete('empleados/{storeUser}',   [StoreUserController::class, 'destroy'])->name('store.users.destroy');
+
+// ── Rutas de Proveedores ──────────────────────────────────────────
+Route::get('proveedores',                   [SupplierController::class, 'index'])->name('store.suppliers.index');
+Route::get('proveedores/crear',             [SupplierController::class, 'create'])->name('store.suppliers.create');
+Route::post('proveedores',                  [SupplierController::class, 'store'])->name('store.suppliers.store');
+Route::get('proveedores/{supplier}',        [SupplierController::class, 'show'])->name('store.suppliers.show');
+Route::get('proveedores/{supplier}/editar', [SupplierController::class, 'edit'])->name('store.suppliers.edit');
+Route::put('proveedores/{supplier}',        [SupplierController::class, 'update'])->name('store.suppliers.update');
+Route::delete('proveedores/{supplier}',     [SupplierController::class, 'destroy'])->name('store.suppliers.destroy');
+Route::post('proveedores/{supplier}/abonar',[SupplierPaymentController::class, 'store'])->name('store.supplierPayments.store');
+ 
+// ── Rutas de Compras ──────────────────────────────────────────────
+Route::get('compras',                       [PurchaseController::class, 'index'])->name('store.purchases.index');
+Route::get('compras/crear',                 [PurchaseController::class, 'create'])->name('store.purchases.create');
+Route::post('compras',                      [PurchaseController::class, 'store'])->name('store.purchases.store');
+Route::get('compras/{purchase}',            [PurchaseController::class, 'show'])->name('store.purchases.show');
+ 
+
 });
 
 // ─── Auth empleados ────────────────────────────────────────
