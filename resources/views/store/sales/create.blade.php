@@ -4,7 +4,7 @@
 @section('page-subtitle', 'Registra productos rápidamente')
 
 @section('content')
-<div class="max-w-5xl pb-10">
+<div class="max-w-5xl pb-10 px-2">
     <form method="POST" action="{{ route('store.sales.store') }}" id="saleForm">
         @csrf
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">

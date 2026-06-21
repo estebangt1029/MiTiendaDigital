@@ -186,7 +186,27 @@
             <span>Clientes / Fiados</span>
         </a>
 
-        {{-- 4. Historial de ventas: consulta puntual, menos frecuente --}}
+        {{-- 4. Compras: registro de mercancía recibida de proveedores --}}
+        <a href="{{ route('store.purchases.index') }}"
+           class="nav-link {{ request()->routeIs('store.purchases.*') ? 'active' : 'inactive' }}">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M20 12V8H6a2 2 0 01-2-2c0-1.1.9-2 2-2h12v4M4 6v12c0 1.1.9 2 2 2h14v-4M18 12a2 2 0 00-2 2c0 1.1.9 2 2 2h4v-4h-4z"/>
+            </svg>
+            <span>Compras</span>
+        </a>
+
+        {{-- 5. Proveedores / Cuentas por pagar: consulta de deudas a proveedores --}}
+        <a href="{{ route('store.suppliers.index') }}"
+           class="nav-link {{ request()->routeIs('store.suppliers.*') ? 'active' : 'inactive' }}">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M19 7l-7 7-4-4-6 6m18-10h-6m6 0v6"/>
+            </svg>
+            <span>Proveedores</span>
+        </a>
+
+        {{-- 6. Historial de ventas: consulta puntual, menos frecuente --}}
         <a href="{{ route('store.sales.index') }}"
            class="nav-link {{ request()->routeIs('store.sales.index') || request()->routeIs('store.sales.show') ? 'active' : 'inactive' }}">
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -196,7 +216,7 @@
             <span>Historial ventas</span>
         </a>
 
-        {{-- 5. Reportes: se mira de vez en cuando, no a diario --}}
+        {{-- 7. Reportes: se mira de vez en cuando, no a diario --}}
         <a href="{{ route('store.reports.index') }}"
            class="nav-link {{ request()->routeIs('store.reports.*') ? 'active' : 'inactive' }}">
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -206,7 +226,7 @@
             <span>Reportes</span>
         </a>
 
-        {{-- 6. Empleados: configuración ocasional, misma tienda, sin separador --}}
+        {{-- 8. Empleados: configuración ocasional, misma tienda, sin separador --}}
         <a href="{{ route('store.users.index') }}"
            class="nav-link {{ request()->routeIs('store.users.*') ? 'active' : 'inactive' }}">
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -224,26 +244,6 @@
                       d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
             </svg>
             <span>Categorías</span>
-        </a>
-
-        {{-- 7. proveedores --}}
-        <a href="{{ route('store.suppliers.index') }}"
-           class="nav-link {{ request()->routeIs('store.suppliers.*') ? 'active' : 'inactive' }}">
-            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
-            </svg>
-            <span>Proveedores</span>
-        </a>
-
-        {{-- 7. compras --}}
-        <a href="{{ route('store.purchases.index') }}"
-           class="nav-link {{ request()->routeIs('store.purchases.*') ? 'active' : 'inactive' }}">
-            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
-            </svg>
-            <span>Compras</span>
         </a>
     </nav>
 

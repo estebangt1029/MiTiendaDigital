@@ -33,6 +33,8 @@ use App\Http\Controllers\Store\SupplierController;
 use App\Http\Controllers\Store\PurchaseController;
 use App\Http\Controllers\Store\SupplierPaymentController;
 
+use App\Http\Controllers\Owner\CompareController;
+
 
 // ─── Rutas públicas ────────────────────────────────────────
 Route::get('/', fn() => view('landing'))->name('landing');
@@ -50,7 +52,7 @@ Route::prefix('owner')->name('owner.')->group(function () {
     Route::middleware('auth.owner')->group(function () {
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::resource('stores', StoreController::class)->except(['show']);
-
+        Route::get('comparar', [CompareController::class, 'index'])->name('compare');
         Route::get('entrar/{store_id}', function ($store_id) {
             $store = \App\Models\Store::where('owner_id', Auth::guard('owner')->id())
                                       ->findOrFail($store_id);
