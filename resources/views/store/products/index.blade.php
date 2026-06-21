@@ -53,28 +53,15 @@
                     <option value="low">Stock bajo</option>
                     <option value="out">Agotados</option>
                 </select>
-                <button onclick="toggleBarcodeScanner()"
+                {{-- Escáner con cámara del celular --}}
+                <button type="button" onclick="openCameraScanner()"
                     class="border border-indigo-200 text-indigo-600 px-3 py-2.5 rounded-xl text-sm hover:bg-indigo-50 flex items-center gap-1.5 transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+                              d="M3 9V7a2 2 0 012-2h2M3 15v2a2 2 0 002 2h2m8-16h2a2 2 0 012 2v2m-4 12h2a2 2 0 002-2v-2M7 12h10"/>
                     </svg>
                     <span class="hidden sm:inline">Escanear</span>
                 </button>
-            </div>
-        </div>
-
-        {{-- Lector de barras --}}
-        <div id="barcodeScanner" class="hidden mt-3">
-            <div class="flex gap-2 items-center bg-indigo-50 border border-indigo-200 rounded-xl px-3 py-2.5">
-                <svg class="w-4 h-4 text-indigo-500 animate-pulse flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M2 4a1 1 0 011-1h1a1 1 0 010 2H3a1 1 0 01-1-1zm4 0a1 1 0 011-1h1a1 1 0 010 2H7a1 1 0 01-1-1zm5-1a1 1 0 000 2h1a1 1 0 000-2h-1zm4 0a1 1 0 000 2h1a1 1 0 000-2h-1zM2 8a1 1 0 011-1h1a1 1 0 010 2H3a1 1 0 01-1-1zm13-1a1 1 0 000 2h1a1 1 0 000-2h-1zM2 12a1 1 0 011-1h1a1 1 0 010 2H3a1 1 0 01-1-1zm13-1a1 1 0 000 2h1a1 1 0 000-2h-1z"/>
-                </svg>
-                <input type="text" id="barcodeInput" autofocus
-                    placeholder="Escanea el código de barras..."
-                    class="flex-1 bg-transparent text-sm focus:outline-none text-indigo-700"
-                    onkeydown="handleBarcode(event)">
-                <button onclick="toggleBarcodeScanner()" class="text-indigo-400 hover:text-indigo-600 text-xs">✕</button>
             </div>
         </div>
 
@@ -83,6 +70,22 @@
             <button onclick="clearFilters()" class="text-xs text-indigo-500 hover:underline hidden" id="clearBtn">
                 Limpiar filtros
             </button>
+        </div>
+    </div>
+
+    {{-- ══ MODAL: Escáner de cámara ══ --}}
+    <div id="cameraModal" class="hidden fixed inset-0 bg-black z-50 flex flex-col">
+        <div class="flex items-center justify-between px-4 py-3 bg-black/80 text-white">
+            <p class="font-medium text-sm">📷 Apunta al código de barras</p>
+            <button type="button" onclick="closeCameraScanner()" class="p-2 hover:bg-white/10 rounded-lg">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <div id="cameraReader" class="flex-1"></div>
+        <div id="cameraStatus" class="px-4 py-3 bg-black/80 text-center text-white text-sm min-h-[48px] flex items-center justify-center">
+            Iniciando cámara...
         </div>
     </div>
 
@@ -289,6 +292,7 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
 function filterProducts() {
     const search   = document.getElementById('searchInput').value.toLowerCase();
@@ -320,23 +324,70 @@ function clearFilters() {
     filterProducts();
 }
 
-function toggleBarcodeScanner() {
-    const scanner = document.getElementById('barcodeScanner');
-    scanner.classList.toggle('hidden');
-    if (!scanner.classList.contains('hidden')) {
-        document.getElementById('barcodeInput').focus();
-    }
+// ══════════════════════════════════════════════════════════
+// Escáner de código de barras con cámara (html5-qrcode)
+// ══════════════════════════════════════════════════════════
+let html5QrCode = null;
+let scannerRunning = false;
+
+function openCameraScanner() {
+    document.getElementById('cameraModal').classList.remove('hidden');
+    document.getElementById('cameraStatus').textContent = 'Iniciando cámara...';
+
+    html5QrCode = new Html5Qrcode('cameraReader');
+
+    // Formatos típicos de productos de tienda: EAN-13, EAN-8, UPC-A, UPC-E, CODE-128
+    const config = {
+        fps: 10,
+        qrbox: { width: 280, height: 140 },
+        formatsToSupport: [
+            Html5QrcodeSupportedFormats.EAN_13,
+            Html5QrcodeSupportedFormats.EAN_8,
+            Html5QrcodeSupportedFormats.UPC_A,
+            Html5QrcodeSupportedFormats.UPC_E,
+            Html5QrcodeSupportedFormats.CODE_128,
+        ],
+    };
+
+    html5QrCode.start(
+        { facingMode: 'environment' }, // cámara trasera
+        config,
+        onScanSuccess,
+        () => { /* errores de frame individual, se ignoran, son normales mientras enfoca */ }
+    ).then(() => {
+        scannerRunning = true;
+        document.getElementById('cameraStatus').textContent = 'Apunta al código de barras del producto';
+    }).catch(err => {
+        document.getElementById('cameraStatus').textContent =
+            '⚠ No se pudo acceder a la cámara. Revisa los permisos del navegador.';
+        console.error('Error cámara:', err);
+    });
 }
 
-function handleBarcode(e) {
-    if (e.key === 'Enter') {
-        const code = e.target.value.trim();
-        if (code) {
-            document.getElementById('searchInput').value = code;
-            filterProducts();
-            e.target.value = '';
-            toggleBarcodeScanner();
-        }
+function onScanSuccess(decodedText) {
+    if (!scannerRunning) return; // evita doble disparo mientras se cierra
+
+    document.getElementById('cameraStatus').textContent = '✓ Código detectado: ' + decodedText;
+
+    // Vibración corta si el dispositivo lo soporta (feedback táctil de "leído")
+    if (navigator.vibrate) navigator.vibrate(100);
+
+    closeCameraScanner();
+
+    // Aplica el código al buscador normal y filtra
+    document.getElementById('searchInput').value = decodedText;
+    filterProducts();
+}
+
+function closeCameraScanner() {
+    document.getElementById('cameraModal').classList.add('hidden');
+    if (html5QrCode && scannerRunning) {
+        html5QrCode.stop().then(() => {
+            html5QrCode.clear();
+            scannerRunning = false;
+        }).catch(() => {
+            scannerRunning = false;
+        });
     }
 }
 
@@ -358,7 +409,12 @@ function changeStockQty(delta) {
     input.value = Math.max(1, parseInt(input.value || 1) + delta);
 }
 
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeStockModal(); });
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+        closeStockModal();
+        closeCameraScanner();
+    }
+});
 document.getElementById('stockModal').addEventListener('click', function(e) {
     if (e.target === this) closeStockModal();
 });

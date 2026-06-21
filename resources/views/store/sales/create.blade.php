@@ -14,7 +14,17 @@
 
                 {{-- Buscador de productos --}}
                 <div class="bg-white rounded-xl shadow p-4">
-                    <label class="block text-sm font-semibold mb-2">🔍 Buscar producto</label>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="block text-sm font-semibold">🔍 Buscar producto</label>
+                        <button type="button" onclick="openCameraScanner()"
+                            class="flex items-center gap-1.5 bg-indigo-600 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition-colors font-medium">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M3 9V7a2 2 0 012-2h2M3 15v2a2 2 0 002 2h2m8-16h2a2 2 0 012 2v2m-4 12h2a2 2 0 002-2v-2M7 12h10"/>
+                            </svg>
+                            Escanear
+                        </button>
+                    </div>
                     <div class="relative">
                         <input type="text" id="productSearch"
                             placeholder="Escribe el nombre o escanea el código de barras..."
@@ -41,7 +51,7 @@
 
                     <div id="emptyMsg" class="px-4 py-10 text-center text-gray-400 text-sm">
                         <p class="text-3xl mb-2">🛒</p>
-                        <p>Busca y agrega productos arriba</p>
+                        <p>Busca, escanea o agrega productos arriba</p>
                     </div>
                 </div>
             </div>
@@ -159,9 +169,27 @@
         </div>
     </form>
 </div>
+
+{{-- ══ MODAL: Escáner de cámara ══ --}}
+<div id="cameraModal" class="hidden fixed inset-0 bg-black z-50 flex flex-col">
+    <div class="flex items-center justify-between px-4 py-3 bg-black/80 text-white">
+        <p class="font-medium text-sm">📷 Apunta al código de barras</p>
+        <button type="button" onclick="closeCameraScanner()" class="p-2 hover:bg-white/10 rounded-lg">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+    </div>
+    <div id="cameraReader" class="flex-1"></div>
+    <div id="cameraStatus" class="px-4 py-3 bg-black/80 text-center text-white text-sm min-h-[48px] flex items-center justify-center">
+        Iniciando cámara...
+    </div>
+</div>
+
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
 const products  = @json($products);
 const customers = @json($customers);
@@ -412,6 +440,86 @@ document.addEventListener('click', e => {
     if (!e.target.closest('#customerSearch') && !e.target.closest('#customerResults')) {
         document.getElementById('customerResults').classList.add('hidden');
     }
+});
+
+// ══════════════════════════════════════════════════════════
+// Escáner de código de barras con cámara (html5-qrcode)
+// ══════════════════════════════════════════════════════════
+let html5QrCode = null;
+let scannerRunning = false;
+
+function openCameraScanner() {
+    document.getElementById('cameraModal').classList.remove('hidden');
+    document.getElementById('cameraStatus').textContent = 'Iniciando cámara...';
+
+    html5QrCode = new Html5Qrcode('cameraReader');
+
+    const config = {
+        fps: 10,
+        qrbox: { width: 280, height: 140 },
+        formatsToSupport: [
+            Html5QrcodeSupportedFormats.EAN_13,
+            Html5QrcodeSupportedFormats.EAN_8,
+            Html5QrcodeSupportedFormats.UPC_A,
+            Html5QrcodeSupportedFormats.UPC_E,
+            Html5QrcodeSupportedFormats.CODE_128,
+        ],
+    };
+
+    html5QrCode.start(
+        { facingMode: 'environment' },
+        config,
+        onScanSuccess,
+        () => { /* errores de frame, normales mientras enfoca */ }
+    ).then(() => {
+        scannerRunning = true;
+        document.getElementById('cameraStatus').textContent = 'Apunta al código de barras del producto';
+    }).catch(err => {
+        document.getElementById('cameraStatus').textContent =
+            '⚠ No se pudo acceder a la cámara. Revisa los permisos del navegador.';
+        console.error('Error cámara:', err);
+    });
+}
+
+function onScanSuccess(decodedText) {
+    if (!scannerRunning) return;
+
+    if (navigator.vibrate) navigator.vibrate(100);
+
+    // Buscar coincidencia exacta de código de barras
+    const product = products.find(p => p.barcode === decodedText);
+
+    if (product) {
+        document.getElementById('cameraStatus').textContent = '✓ ' + product.name + ' agregado';
+        setTimeout(() => closeCameraScanner(), 600);
+        addToCart(product.id);
+    } else {
+        // Sin coincidencia: lo dejamos en el buscador para que el tendero
+        // vea qué se escaneó y decida (puede que el producto no esté creado aún)
+        document.getElementById('cameraStatus').textContent =
+            '⚠ Código no encontrado: ' + decodedText;
+        setTimeout(() => {
+            closeCameraScanner();
+            document.getElementById('productSearch').value = decodedText;
+            searchProducts(decodedText);
+        }, 1200);
+    }
+}
+
+function closeCameraScanner() {
+    document.getElementById('cameraModal').classList.add('hidden');
+    if (html5QrCode && scannerRunning) {
+        html5QrCode.stop().then(() => {
+            html5QrCode.clear();
+            scannerRunning = false;
+        }).catch(() => {
+            scannerRunning = false;
+        });
+    }
+}
+
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeCameraScanner();
 });
 
 // Inicializar
