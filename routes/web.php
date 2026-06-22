@@ -181,3 +181,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('subscriptions/{subscription}/cancel',   [AdminSubscriptionController::class, 'cancel'])->name('subscriptions.cancel');
     });
 });
+
+Route::post(
+    '/store/products/ajax-create',
+    [ProductController::class, 'ajaxCreate']
+)->name('store.products.ajax-create');

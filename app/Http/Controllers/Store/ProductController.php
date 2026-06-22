@@ -151,4 +151,49 @@ class ProductController extends Controller
 
         return response()->json($product->load('category'));
     }
+
+    public function ajaxCreate(Request $request)
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'barcode' => 'required|string|max:100',
+        'price' => 'required|numeric|min:0',
+        'cost' => 'nullable|numeric|min:0',
+        'stock' => 'required|integer|min:0',
+    ]);
+
+    $store = $this->currentStore();
+
+    $existing = $store->products()
+        ->where('barcode', $request->barcode)
+        ->first();
+
+    if ($existing) {
+        return response()->json([
+            'error' => 'Ya existe un producto con ese código'
+        ], 422);
+    }
+
+    $product = $store->products()->create([
+        'name' => $request->name,
+        'barcode' => $request->barcode,
+        'price' => $request->price,
+        'cost' => $request->cost ?? 0,
+        'stock' => $request->stock,
+        'min_stock' => 5,
+        'active' => true
+    ]);
+
+    InventoryLog::create([
+        'store_id' => $store->id,
+        'product_id' => $product->id,
+        'type' => 'entrada',
+        'quantity' => $product->stock,
+        'stock_before' => 0,
+        'stock_after' => $product->stock,
+        'note' => 'Stock inicial'
+    ]);
+
+    return response()->json($product);
+}
 }

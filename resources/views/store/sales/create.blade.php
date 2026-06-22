@@ -199,6 +199,71 @@
     </div>
 </div>
 
+<div
+    id="createProductModal"
+    class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center p-4">
+
+    <div class="bg-white rounded-2xl w-full max-w-md p-6">
+
+        <h3 class="text-lg font-bold mb-4">
+            Crear producto
+        </h3>
+
+        <input
+            id="newBarcode"
+            type="text"
+            class="w-full border rounded-lg px-3 py-2 mb-3 bg-gray-100"
+            readonly>
+
+        <input
+            id="newName"
+            type="text"
+            placeholder="Nombre"
+            class="w-full border rounded-lg px-3 py-2 mb-3">
+
+        <input
+            id="newPrice"
+            type="number"
+            placeholder="Precio venta"
+            class="w-full border rounded-lg px-3 py-2 mb-3">
+
+        <input
+            id="newCost"
+            type="number"
+            placeholder="Costo"
+            class="w-full border rounded-lg px-3 py-2 mb-3">
+
+        <input
+            id="newStock"
+            type="number"
+            value="1"
+            placeholder="Stock inicial"
+            class="w-full border rounded-lg px-3 py-2 mb-5">
+
+        <div class="flex gap-3">
+
+            <button
+                onclick="saveNewProduct()"
+                class="flex-1 bg-indigo-600 text-white py-2 rounded-lg">
+
+                Crear y agregar
+
+            </button>
+
+            <button
+                onclick="closeCreateProductModal()"
+                class="flex-1 border py-2 rounded-lg">
+
+                Cancelar
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
 @endsection
 
 @push('scripts')
@@ -261,7 +326,14 @@ function handleSearchKey(e) {
 
 function addToCart(productId) {
     const product = products.find(p => p.id === productId);
-    if (!product || product.stock === 0) return;
+    if (!product) {
+
+    closeCameraScanner();
+
+    openCreateProductModal(barcode);
+
+    return;
+}
 
     if (cart[productId]) {
         if (cart[productId].quantity >= product.stock) {
@@ -604,5 +676,73 @@ document.addEventListener('keydown', e => {
 
 // Inicializar
 selectType('contado');
+
+function openCreateProductModal(barcode) {
+
+    document
+        .getElementById('createProductModal')
+        .classList.remove('hidden');
+
+    document
+        .getElementById('newBarcode')
+        .value = barcode;
+
+    document
+        .getElementById('newName')
+        .focus();
+}
+
+function closeCreateProductModal() {
+
+    document
+        .getElementById('createProductModal')
+        .classList.add('hidden');
+}
+
+async function saveNewProduct() {
+
+    try {
+
+        const response = await fetch(
+            "{{ route('store.products.ajax-create') }}",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN":
+                        document.querySelector(
+                            'meta[name="csrf-token"]'
+                        ).content
+                },
+                body: JSON.stringify({
+                    barcode: document.getElementById('newBarcode').value,
+                    name: document.getElementById('newName').value,
+                    price: document.getElementById('newPrice').value,
+                    cost: document.getElementById('newCost').value || 0,
+                    stock: document.getElementById('newStock').value
+                })
+            }
+        );
+
+        const product = await response.json();
+
+        if (!response.ok) {
+            throw new Error(product.error || 'Error');
+        }
+
+        products.push(product);
+
+        addToCart(product.id);
+
+        closeCreateProductModal();
+
+        alert('Producto creado y agregado');
+
+    } catch (error) {
+
+        alert(error.message);
+
+    }
+}
 </script>
 @endpush
