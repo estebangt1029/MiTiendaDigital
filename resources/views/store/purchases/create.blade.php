@@ -133,14 +133,21 @@
 @endsection
 
 @push('scripts')
+
+@php
+$productsJson = $products->map(function ($p) {
+    return [
+        'id'       => $p->id,
+        'name'     => $p->name,
+        'cost'     => (float) $p->cost,
+        'stock'    => $p->stock,
+        'category' => optional($p->category)->name,
+    ];
+})->values();
+@endphp
 <script>
-const allProducts = @json($products->map(fn($p) => [
-    'id'    => $p->id,
-    'name'  => $p->name,
-    'cost'  => (float) $p->cost,
-    'stock' => $p->stock,
-    'category' => $p->category->name ?? null,
-]));
+    const allProducts = @json($productsJson);
+
 
 let items = {}; // { productId: { name, quantity, unit_cost } }
 

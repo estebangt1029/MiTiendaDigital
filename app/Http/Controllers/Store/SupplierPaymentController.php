@@ -30,17 +30,56 @@ class SupplierPaymentController extends Controller
         ]);
 
         DB::transaction(function () use ($request, $store, $supplier) {
-            $supplier->payments()->create([
-                'store_id'      => $store->id,
-                'store_user_id' => null,
-                'purchase_id'   => null, // abono general, no atado a una compra específica
-                'amount'        => $request->amount,
-                'method'        => $request->method ?? 'efectivo',
-                'notes'         => $request->notes,
+
+    $amount = $request->amount;
+
+    $supplier->payments()->create([
+        'store_id'      => $store->id,
+        'store_user_id' => null,
+        'purchase_id'   => null,
+        'amount'        => $amount,
+        'method'        => $request->method ?? 'efectivo',
+        'notes'         => $request->notes,
+    ]);
+
+    $supplier->decrement('total_debt', $amount);
+
+    $purchases = $supplier->purchases()
+        ->where('debt', '>', 0)
+        ->orderBy('created_at')
+        ->get();
+
+    foreach ($purchases as $purchase) {
+
+        if ($amount <= 0) {
+            break;
+        }
+
+        $debt = $purchase->debt;
+
+        if ($amount >= $debt) {
+
+            $purchase->update([
+                'paid' => $purchase->paid + $debt,
+                'debt' => 0,
+                'status' => 'pagada',
             ]);
 
-            $supplier->decrement('total_debt', $request->amount);
-        });
+            $amount -= $debt;
+
+        } else {
+
+            $purchase->update([
+                'paid' => $purchase->paid + $amount,
+                'debt' => $debt - $amount,
+                'status' => 'parcial',
+            ]);
+
+            $amount = 0;
+        }
+    }
+
+});
 
         return back()->with('success', 'Abono registrado correctamente.');
     }
