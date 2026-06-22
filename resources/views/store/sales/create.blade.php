@@ -16,14 +16,27 @@
                 <div class="bg-white rounded-xl shadow p-4">
                     <div class="flex items-center justify-between mb-2">
                         <label class="block text-sm font-semibold">🔍 Buscar producto</label>
-                        <button type="button" onclick="openCameraScanner()"
-                            class="flex items-center gap-1.5 bg-indigo-600 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition-colors font-medium">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M3 9V7a2 2 0 012-2h2M3 15v2a2 2 0 002 2h2m8-16h2a2 2 0 012 2v2m-4 12h2a2 2 0 002-2v-2M7 12h10"/>
-                            </svg>
-                            Escanear
-                        </button>
+                        <div class="flex gap-2">
+
+    <button
+        type="button"
+        onclick="startScanner('single')"
+        class="flex items-center gap-1.5 bg-indigo-600 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-indigo-700">
+
+        📷 Escanear
+
+    </button>
+
+    <button
+        type="button"
+        onclick="startScanner('continuous')"
+        class="flex items-center gap-1.5 bg-emerald-600 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-emerald-700">
+
+        📦 Continuo
+
+    </button>
+
+</div>
                     </div>
                     <div class="relative">
                         <input type="text" id="productSearch"
@@ -448,6 +461,24 @@ document.addEventListener('click', e => {
 let html5QrCode = null;
 let scannerRunning = false;
 
+// Evita múltiples lecturas del mismo código
+let lastScannedCode = null;
+let lastScanTime = 0;
+
+// single = cierra después de leer
+// continuous = sigue leyendo
+let scanMode = 'single';
+
+function startScanner(mode = 'single') {
+
+    scanMode = mode;
+
+    lastScannedCode = null;
+    lastScanTime = 0;
+
+    openCameraScanner();
+}
+
 function openCameraScanner() {
     document.getElementById('cameraModal').classList.remove('hidden');
     document.getElementById('cameraStatus').textContent = 'Iniciando cámara...';
@@ -482,27 +513,73 @@ function openCameraScanner() {
 }
 
 function onScanSuccess(decodedText) {
+
     if (!scannerRunning) return;
 
-    if (navigator.vibrate) navigator.vibrate(100);
+    const barcode = decodedText.trim();
+    const now = Date.now();
 
-    // Buscar coincidencia exacta de código de barras
-    const product = products.find(p => p.barcode === decodedText);
+    // Evitar lecturas repetidas
+    if (
+        barcode === lastScannedCode &&
+        now - lastScanTime < 2000
+    ) {
+        return;
+    }
+
+    lastScannedCode = barcode;
+    lastScanTime = now;
+
+    if (navigator.vibrate) {
+        navigator.vibrate(100);
+    }
+
+    const product = products.find(
+        p => p.barcode && p.barcode.trim() === barcode
+    );
 
     if (product) {
-        document.getElementById('cameraStatus').textContent = '✓ ' + product.name + ' agregado';
-        setTimeout(() => closeCameraScanner(), 600);
+
         addToCart(product.id);
-    } else {
-        // Sin coincidencia: lo dejamos en el buscador para que el tendero
-        // vea qué se escaneó y decida (puede que el producto no esté creado aún)
+
         document.getElementById('cameraStatus').textContent =
-            '⚠ Código no encontrado: ' + decodedText;
+            '✓ ' + product.name + ' agregado';
+
+        if (scanMode === 'single') {
+
+            setTimeout(() => {
+                closeCameraScanner();
+            }, 500);
+
+        } else {
+
+            setTimeout(() => {
+                document.getElementById('cameraStatus').textContent =
+                    'Apunta al siguiente producto';
+            }, 1000);
+
+        }
+
+    } else {
+
+        document.getElementById('cameraStatus').textContent =
+            '⚠ Código no encontrado';
+
         setTimeout(() => {
+
             closeCameraScanner();
-            document.getElementById('productSearch').value = decodedText;
-            searchProducts(decodedText);
-        }, 1200);
+
+            document.getElementById('productSearch').value = barcode;
+
+            searchProducts(barcode);
+
+            alert(
+                'El producto no existe.\n\nCódigo: ' +
+                barcode +
+                '\n\nDebes crearlo en inventario.'
+            );
+
+        }, 1000);
     }
 }
 
@@ -512,6 +589,9 @@ function closeCameraScanner() {
         html5QrCode.stop().then(() => {
             html5QrCode.clear();
             scannerRunning = false;
+
+            lastScannedCode = null;
+lastScanTime = 0;
         }).catch(() => {
             scannerRunning = false;
         });
