@@ -269,7 +269,7 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
-const products  = @json($products);
+let products  = @json($products);
 const customers = @json($customers);
 let cart        = {}; // { product_id: { product, quantity } }
 let total       = 0;
@@ -327,11 +327,6 @@ function handleSearchKey(e) {
 function addToCart(productId) {
     const product = products.find(p => p.id === productId);
     if (!product) {
-
-    closeCameraScanner();
-
-    openCreateProductModal(barcode);
-
     return;
 }
 
@@ -612,6 +607,7 @@ function onScanSuccess(decodedText) {
 
     if (product) {
 
+        playScanSound();
         addToCart(product.id);
 
         document.getElementById('cameraStatus').textContent =
@@ -634,25 +630,19 @@ function onScanSuccess(decodedText) {
 
     } else {
 
-        document.getElementById('cameraStatus').textContent =
-            '⚠ Código no encontrado';
+    playErrorSound();
+    document.getElementById('cameraStatus').textContent =
+        '⚠ Producto no encontrado';
 
-        setTimeout(() => {
+    setTimeout(() => {
 
-            closeCameraScanner();
+        closeCameraScanner();
 
-            document.getElementById('productSearch').value = barcode;
+        openCreateProductModal(barcode);
 
-            searchProducts(barcode);
+    }, 500);
 
-            alert(
-                'El producto no existe.\n\nCódigo: ' +
-                barcode +
-                '\n\nDebes crearlo en inventario.'
-            );
-
-        }, 1000);
-    }
+}
 }
 
 function closeCameraScanner() {
@@ -733,6 +723,7 @@ async function saveNewProduct() {
         products.push(product);
 
         addToCart(product.id);
+        playScanSound();
 
         closeCreateProductModal();
 
@@ -743,6 +734,56 @@ async function saveNewProduct() {
         alert(error.message);
 
     }
+}
+
+function playScanSound() {
+
+    const audioContext =
+        new (window.AudioContext || window.webkitAudioContext)();
+
+    const oscillator =
+        audioContext.createOscillator();
+
+    const gainNode =
+        audioContext.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    oscillator.frequency.value = 1200;
+
+    gainNode.gain.value = 0.08;
+
+    oscillator.start();
+
+    oscillator.stop(
+        audioContext.currentTime + 0.08
+    );
+}
+
+function playErrorSound() {
+
+    const audioContext =
+        new (window.AudioContext || window.webkitAudioContext)();
+
+    const oscillator =
+        audioContext.createOscillator();
+
+    const gainNode =
+        audioContext.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    oscillator.frequency.value = 300;
+
+    gainNode.gain.value = 0.08;
+
+    oscillator.start();
+
+    oscillator.stop(
+        audioContext.currentTime + 0.25
+    );
 }
 </script>
 @endpush
